@@ -31,7 +31,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             case 'full_text':
                 $sql = "SELECT DISTINCT suomi as 'Suomi',saame as 'Sápmi' FROM suomisaame WHERE suomisaame match :query AND rank MATCH 'bm25(10.0, 5.0)' ORDER BY rank limit 1000;";
                 break;
-
             default:
                 $sql = "SELECT DISTINCT suomi as 'Suomi',saame as 'Sápmi' FROM suomisaame WHERE suomisaame match :query AND rank MATCH 'bm25(10.0, 5.0)' ORDER BY rank limit 1000;";
         }
@@ -57,9 +56,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 }
+// Initialize the searchType variables
+if (isset($_POST['finnish_to_sami'])) {
+    $finnish_to_sami = $_POST['finnish_to_sami'];
+}
+if (isset($_POST['sami_to_finnish'])) {
+    $sami_to_finnish = $_POST['sami_to_finnish'];
+}
+if (isset($_POST['full_text'])) {
+    $full_text = $_POST['full_text'];
+}
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -86,7 +95,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             border-radius: 10px;
         }
         h1 {
-            color: #0053A5;
+            color: #0f1012;
         }
         form {
             display: flex;
@@ -125,21 +134,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </header>
     <main>
         <form method="POST">
-            <label for="searchType">Valitse hakuoptio - Válje ohcumolssaeaktu</label>
+            <label for="searchType">Valitse hakuoptio - Vállje ohcumolssaeaktu</label>
             <select id="searchType" name="searchType" required>
-                <option value="finnish_to_sami">Haku suomen kielellä</option>
-                <option value="sami_to_finnish">Oza sámegillii</option>
-                <option value="full_text">Kokotekstihaku - Ollesdeakstaohcu</option>
+                <option <?php if (isset($full_text)) { echo "selected"; }?> value="full_text">Kokotekstihaku - Ollesdeakstaohcu</option>
+                <option <?php if (isset($finnish_to_sami)) { echo "selected"; }?> value="finnish_to_sami">Haku suomen kielellä</option>
+                <option <?php if (isset($sami_to_finnish)) { echo "selected"; }?> value="sami_to_finnish">Oza sámegillii</option>
             </select>
-            
-            <label for="query">Etsi - Ohca</label>
-            <input type="text" id="query" name="query" required>
-            
+            <label for="query">Hae - Oza</label>
+            <input type="text" id="query" name="query" required>            
             <input type="submit" value="Hae - Oza">
         </form>
-
         <?php if (!empty($searchResults)): ?>
-            <h2>Search Results:</h2>
+            <h2>Hakutulokset - Ohcubohtosat</h2>
             <table>
                 <thead>
                     <tr>
@@ -157,11 +163,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </tbody>
             </table>
         <?php elseif ($_SERVER['REQUEST_METHOD'] === 'POST'): ?>
-            <p>No results found for your search.</p>
+            <p>Ei hakutuloksia - Ii ohcubohtosiid</p>
         <?php endif; ?>
     </main>
     <footer>
-        <p>© 2024 - Satnegirji by Skuolfi</p>
+        <p>© 2024 - Skuolfi</p>
     </footer>
 </body>
 </html>
