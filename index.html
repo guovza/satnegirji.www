@@ -1,0 +1,167 @@
+<?php
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+// Connect to SQLite database
+$db = new SQLite3('/home/muaybora/db/satnegirji.db');
+
+// Function to sanitize user input
+function sanitizeInput($input) {
+    $input = str_replace(";", "", $input);
+    $input = str_replace("*", "%", $input);
+    return $input;
+}
+
+// Search logic
+$searchResults = [];
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $searchType = $_POST['searchType'];
+    $query = sanitizeInput($_POST['query']);
+
+    if (!empty($query)) {
+        switch ($searchType) {
+            case 'finnish_to_sami':
+                $sql = "SELECT DISTINCT suomi AS 'Suomi', saame AS 'Sápmi' FROM skirja WHERE suomi LIKE :query ORDER BY suomi LIMIT 1000;";
+                break;
+
+            case 'sami_to_finnish':
+                $sql = "SELECT DISTINCT suomi AS 'Suomi', saame AS 'Sápmi' FROM skirja WHERE saame LIKE :query ORDER BY saame LIMIT 1000;";
+                break;
+
+            case 'full_text':
+                $sql = "SELECT DISTINCT suomi as 'Suomi',saame as 'Sápmi' FROM suomisaame WHERE suomisaame match :query AND rank MATCH 'bm25(10.0, 5.0)' ORDER BY rank limit 1000;";
+                break;
+
+            default:
+                $sql = "SELECT DISTINCT suomi as 'Suomi',saame as 'Sápmi' FROM suomisaame WHERE suomisaame match :query AND rank MATCH 'bm25(10.0, 5.0)' ORDER BY rank limit 1000;";
+        }
+        if ($sql) {
+            // Log the query and parameter values for debugging
+            error_log("SQL: $sql");
+            error_log("Query: " . '%' . $query . '%');
+        
+            $stmt = $db->prepare($sql);
+            if (!$stmt) {
+                die("Failed to prepare statement: " . $db->lastErrorMsg());
+            }
+            $stmt->bindValue(':query', '%' . $query . '%', SQLITE3_TEXT);
+            $result = $stmt->execute();
+            if (!$result) {
+                die("Query execution failed: " . $db->lastErrorMsg());
+            }
+            while ($row = $result->fetchArray(SQLITE3_ASSOC)) {
+                $searchResults[] = $row;
+            }
+        } else {
+            die("No valid SQL query to execute.");
+        }
+    }
+}
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Suoma-Davvisáme-Suoma sátnegirji</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color:rgb(225, 230, 235); /* Northern Sámi flag blue */
+            color:rgb(38, 38, 37); /* Northern Sámi flag yellow */
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background: rgp(225, 230, 235); /* Northern Sámi flag red */
+            padding: 1em;
+            text-align: center;
+            color: white;
+        }
+        main {
+            padding: 2em;
+            max-width: 800px;
+            margin: auto;
+            background: white;
+            border-radius: 10px;
+        }
+        h1 {
+            color: #0053A5;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 1em;
+        }
+        select, input[type="text"], input[type="submit"] {
+            padding: 0.5em;
+            font-size: 1em;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 2em;
+        }
+        th, td {
+            padding: 0.5em;
+            text-align: left;
+            border: 1px solid #ddd;
+        }
+        th {
+            background-color: white;
+            color: white;
+        }
+        footer {
+            text-align: center;
+            padding: 1em;
+            background: rgp(225, 230, 235);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Suoma-Davvisáme-Suoma sátnegirji</h1>
+    </header>
+    <main>
+        <form method="POST">
+            <label for="searchType">Valitse hakuoptio - Válje ohcumolssaeaktu</label>
+            <select id="searchType" name="searchType" required>
+                <option value="finnish_to_sami">Haku suomen kielellä</option>
+                <option value="sami_to_finnish">Oza sámegillii</option>
+                <option value="full_text">Kokotekstihaku - Ollesdeakstaohcu</option>
+            </select>
+            
+            <label for="query">Etsi - Ohca</label>
+            <input type="text" id="query" name="query" required>
+            
+            <input type="submit" value="Hae - Oza">
+        </form>
+
+        <?php if (!empty($searchResults)): ?>
+            <h2>Search Results:</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Suomi</th>
+                        <th>Sápmi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($searchResults as $row): ?>
+                        <tr>
+                            <td><?= htmlspecialchars($row['Suomi']) ?></td>
+                            <td><?= htmlspecialchars($row['Sápmi']) ?></td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        <?php elseif ($_SERVER['REQUEST_METHOD'] === 'POST'): ?>
+            <p>No results found for your search.</p>
+        <?php endif; ?>
+    </main>
+    <footer>
+        <p>© 2024 - Satnegirji by Skuolfi</p>
+    </footer>
+</body>
+</html>
