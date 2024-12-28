@@ -44,7 +44,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (!$stmt) {
                 die("Failed to prepare statement: " . $db->lastErrorMsg());
             }
-            $stmt->bindValue(':query', '%' . $query . '%', SQLITE3_TEXT);
+            // $stmt->bindValue(':query', '%' . $query . '%', SQLITE3_TEXT);
+            // For full_text, bind without '%' since MATCH uses FTS syntax
+            if ($searchType == 'full_text') {
+                $stmt->bindValue(':query', $query, SQLITE3_TEXT);
+            } else {
+                $stmt->bindValue(':query', '%' . $query . '%', SQLITE3_TEXT);
+            }
             $result = $stmt->execute();
             if (!$result) {
                 die("Query execution failed: " . $db->lastErrorMsg());
