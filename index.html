@@ -69,57 +69,129 @@ if (isset($_POST['full_text'])) {
 ?>
 <!DOCTYPE html>
 <html>
+<!--
+//
+// This work is licensed under
+// Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International.
+// To view a copy of this license,
+// please visit https://creativecommons.org/licenses/by-nc-sa/4.0/
+// Dedicated to the memory of Kristian "Rico" Guttorm.
+//
+-->
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Suoma-Davvisáme-Suoma sátnegirji</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background-color:rgb(225, 230, 235); /* Northern Sámi flag blue */
-            color:rgb(38, 38, 37); /* Northern Sámi flag yellow */
             margin: 0;
-            padding: 0;
+            background-color: #000;
+            /* Fallback color */
+            background-image: url('image2-mobile.webp');
+            /* Default mobile background */
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
         }
+
+        /* Tablet Screens */
+        @media (min-width: 768px) {
+            body {
+                background-image: url('image2-tablet.webp');
+            }
+        }
+
+        /* Desktop Screens */
+        @media (min-width: 1024px) {
+            body {
+                background-image: url('image2-desktop.webp');
+            }
+        }
+
+        /* Fallback for browsers without WebP support */
+        body {
+            background-image: url('image2-mobile.jpg');
+        }
+
+        @media (min-width: 768px) {
+            body {
+                background-image: url('image2-tablet.jpg');
+            }
+        }
+
+        @media (min-width: 1024px) {
+            body {
+                background-image: url('image2-desktop.jpg');
+            }
+        }
+
         header {
-            background: rgp(225, 230, 235); /* Northern Sámi flag red */
+            background: rgp(225, 230, 235);
             padding: 1em;
             text-align: center;
             color: white;
         }
+
         main {
             padding: 2em;
             max-width: 800px;
             margin: auto;
-            background: white;
-            border-radius: 10px;
+            /* background: rgb(167, 199, 245); */
+            background: rgb(131, 101, 91, 0.8);
+            /* opacity: 0.8; */
+            border-radius: 30px;
         }
+
         h1 {
             color: #0f1012;
         }
+
         form {
             display: flex;
             flex-direction: column;
             gap: 1em;
         }
-        select, input[type="text"], input[type="submit"] {
+
+        #searchType {
+            color: black;
+        }
+
+        submit {
+            color: #0f1012;
+        }
+
+        select,
+        input[type="text"],
+        input[type="submit"] {
             padding: 0.5em;
             font-size: 1em;
+            color: #0f1012;
+            border-radius: 20px;
+            outline: none;
         }
+
         table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 2em;
         }
-        th, td {
+
+        th,
+        td {
             padding: 0.5em;
             text-align: left;
             border: 1px solid #ddd;
         }
+
         th {
             background-color: white;
             color: white;
         }
+
+        .search-page-text   {
+            color: white;
+        }
+
         footer {
             text-align: center;
             padding: 1em;
@@ -128,46 +200,41 @@ if (isset($_POST['full_text'])) {
         }
     </style>
 </head>
+
 <body>
     <header>
         <h1>Suoma-Davvisáme-Suoma sátnegirji</h1>
     </header>
     <main>
         <form method="POST">
-            <label for="searchType">Valitse hakuoptio - Vállje ohcumolssaeaktu</label>
+            <label for="searchType" class="search-page-text">Valitse hakuoptio - Vállje ohcumolssaeaktu</label>
             <select id="searchType" name="searchType" required>
-                <option <?php if (isset($full_text)) { echo "selected"; }?> value="full_text">Kokotekstihaku - Ollesdeakstaohcu</option>
-                <option <?php if (isset($finnish_to_sami)) { echo "selected"; }?> value="finnish_to_sami">Haku suomen kielellä</option>
-                <option <?php if (isset($sami_to_finnish)) { echo "selected"; }?> value="sami_to_finnish">Oza sámegillii</option>
+                <option <?php if (isset($full_text)) { echo "selected" ; }?> value="full_text">Kokotekstihaku -
+                    Ollesdeakstaohcu</option>
+                <option <?php if (isset($finnish_to_sami)) { echo "selected" ; }?> value="finnish_to_sami">Haku suomen
+                    kielellä</option>
+                <option <?php if (isset($sami_to_finnish)) { echo "selected" ; }?> value="sami_to_finnish">Oza
+                    sámegillii</option>
             </select>
-            <label for="query">Hae - Oza</label>
-            <input type="text" id="query" name="query" required>            
+            <label for="query" class="search-page-text">Hae - Oza</label>
+            <input type="text" id="query" name="query" required autofocus>
             <input type="submit" value="Hae - Oza">
         </form>
         <?php if (!empty($searchResults)): ?>
-            <h2>Hakutulokset - Ohcubohtosat</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Suomi</th>
-                        <th>Sápmi</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php foreach ($searchResults as $row): ?>
-                        <tr>
-                            <td><?= htmlspecialchars($row['Suomi']) ?></td>
-                            <td><?= htmlspecialchars($row['Sápmi']) ?></td>
-                        </tr>
-                    <?php endforeach; ?>
-                </tbody>
-            </table>
+        <h2 class="search-page-text">Hakutulokset - Ohcubohtosat</h2>
+        <?php foreach ($searchResults as $row): ?>
+        <p class="search-page-text">
+        <b>Suomi:</b> <?= htmlspecialchars($row['Suomi']) ?>
+        <br>
+        <b>Sápmi:</b> <?= htmlspecialchars($row['Sápmi']) ?>
+        </p>
+        <?php endforeach; ?>
         <?php elseif ($_SERVER['REQUEST_METHOD'] === 'POST'): ?>
-            <p>Ei hakutuloksia - Ii ohcubohtosiid</p>
+        <p class="search-page-text">Ei hakutuloksia - Ii ohcubohtosiid</p>
         <?php endif; ?>
     </main>
     <footer>
-        <p>© 2024 - Skuolfi</p>
+        <p>© 2024 - skuolfi.org</p>
     </footer>
 </body>
 </html>
