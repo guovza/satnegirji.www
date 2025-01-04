@@ -1,4 +1,8 @@
 <?php
+header("X-Frame-Options: DENY");
+header("Content-Type: text/html");
+header("X-Content-Type-Options: nosniff");
+header("Cross-Origin-Resource-Policy: same-origin");
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
@@ -99,6 +103,7 @@ if (isset($_POST['searchType']) && $searchType == "full_text") {
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
+            font-family: sans-serif;
         }
 
         /* Tablet Screens */
@@ -153,7 +158,7 @@ if (isset($_POST['searchType']) && $searchType == "full_text") {
             color: #0f1012;
         }
 
-        form {
+        form { 
             display: flex;
             flex-direction: column;
             gap: 1em;
@@ -212,11 +217,32 @@ if (isset($_POST['searchType']) && $searchType == "full_text") {
             width: 100%;
         }
 
-        /* .searchbox {
-            background-image: url('searchicon.png');
-            background-repeat: no-repeat;
+        #submit {
+            color: white;
+            background-color: rgb(197, 191, 177, 0.5);
+            border-color: rgb(197, 191, 177, 0.5);
+            outline: none;
+            position: right;
+        }
+
+        #query {
+            width: 70%;
+        }
+/*
+        .searchbox {
             position: relative;
         }
+
+        #query {
+            width: 100%;
+        }
+
+        #submit {
+            width: 21px;
+            height: 21px;
+            background-image: url('searchicon.png');
+            z-index: 2;
+        } 
 
         .searchbox submit {
             position: absolute;
@@ -246,12 +272,12 @@ if (isset($_POST['searchType']) && $searchType == "full_text") {
             <!-- <label for="query" class="search-page-text">Hae - Oza</label> -->
             <div class="searchbox">
             <input type="text" id="query" name="query" placeholder="hakusana/ohcansátni..." required autofocus>
-            <input type="submit" value="Hae - Oza">
+            <input type="submit" id="submit" value="Hae - Oza">
+            </div>
             <div class="radiorow">
             <input class="radio" type="radio" name="searchType" <?php if ($full_text == true) { echo "checked" ; }?> value="full_text">Kokotekstihaku - Ollesdeakstaohcu 
             <input class="radio" type="radio" name="searchType" <?php if ($finnish_to_sami == true) { echo "checked" ; }?> value="finnish_to_sami">Haku suomeksi 
             <input class="radio" type="radio" name="searchType" <?php if ($sami_to_finnish == true) { echo "checked" ; }?> value="sami_to_finnish">Oza sámegillii
-            </div>
             </div>
         </form>
         <?php if (!empty($searchResults)): ?>
@@ -268,7 +294,7 @@ if (isset($_POST['searchType']) && $searchType == "full_text") {
         <?php endif; ?>
     </main>
     <footer>
-        <p>© 2024 - skuolfi.org</p>
+        <p>© 2025 - skuolfi.org</p>
     </footer>
 </body>
 </html>
