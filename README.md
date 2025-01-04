@@ -1,1 +1,1 @@
-Initial web-version of Suoma-Sáme-Suoma sátnegirji with PHP and SQLite
+web-version of Suoma-Sáme-Suoma sátnegirji with PHP and SQLite.
