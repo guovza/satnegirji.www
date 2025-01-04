@@ -57,14 +57,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 // Initialize the searchType variables
-if (isset($_POST['finnish_to_sami'])) {
-    $finnish_to_sami = $_POST['finnish_to_sami'];
+$finnish_to_sami = false;
+$sami_to_finnish = false;
+$full_text = false;
+if (empty($searchType)) {
+    $full_text = true;
 }
-if (isset($_POST['sami_to_finnish'])) {
-    $sami_to_finnish = $_POST['sami_to_finnish'];
+if (isset($_POST['searchType']) && $searchType == "finnish_to_sami") {
+    $finnish_to_sami = true;
 }
-if (isset($_POST['full_text'])) {
-    $full_text = $_POST['full_text'];
+if (isset($_POST['searchType']) && $searchType == "sami_to_finnish") {
+    $sami_to_finnish = true;
+}
+if (isset($_POST['searchType']) && $searchType == "full_text") {
+    $full_text = true;
 }
 ?>
 <!DOCTYPE html>
@@ -82,6 +88,7 @@ if (isset($_POST['full_text'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Suoma-Davvisáme-Suoma sátnegirji</title>
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
     <style>
         body {
             margin: 0;
@@ -170,6 +177,15 @@ if (isset($_POST['full_text'])) {
             outline: none;
         }
 
+        input[type="text"] {
+            font-size: 16px;
+            background-color: white;
+            background-image: url('searchicon.png');
+            background-position: 10px 10px; 
+            background-repeat: no-repeat;
+            padding: 12px 20px 12px 40px;
+        }
+
         table {
             width: 100%;
             border-collapse: collapse;
@@ -188,7 +204,28 @@ if (isset($_POST['full_text'])) {
             color: white;
         }
 
-        .search-page-text   {
+        .search-page-text {
+            color: white;
+        }
+
+        .searchbox {
+            width: 100%;
+        }
+
+        /* .searchbox {
+            background-image: url('searchicon.png');
+            background-repeat: no-repeat;
+            position: relative;
+        }
+
+        .searchbox submit {
+            position: absolute;
+            position: top-right;
+            z-index: 2;
+        } */
+
+        .radiorow {
+            float: left;
             color: white;
         }
 
@@ -200,25 +237,22 @@ if (isset($_POST['full_text'])) {
         }
     </style>
 </head>
-
 <body>
     <header>
         <h1>Suoma-Davvisáme-Suoma sátnegirji</h1>
     </header>
     <main>
         <form method="POST">
-            <label for="searchType" class="search-page-text">Valitse hakuoptio - Vállje ohcumolssaeaktu</label>
-            <select id="searchType" name="searchType" required>
-                <option <?php if (isset($full_text)) { echo "selected" ; }?> value="full_text">Kokotekstihaku -
-                    Ollesdeakstaohcu</option>
-                <option <?php if (isset($finnish_to_sami)) { echo "selected" ; }?> value="finnish_to_sami">Haku suomen
-                    kielellä</option>
-                <option <?php if (isset($sami_to_finnish)) { echo "selected" ; }?> value="sami_to_finnish">Oza
-                    sámegillii</option>
-            </select>
-            <label for="query" class="search-page-text">Hae - Oza</label>
-            <input type="text" id="query" name="query" required autofocus>
+            <!-- <label for="query" class="search-page-text">Hae - Oza</label> -->
+            <div class="searchbox">
+            <input type="text" id="query" name="query" placeholder="hakusana/ohcansátni..." required autofocus>
             <input type="submit" value="Hae - Oza">
+            <div class="radiorow">
+            <input class="radio" type="radio" name="searchType" <?php if ($full_text == true) { echo "checked" ; }?> value="full_text">Kokotekstihaku - Ollesdeakstaohcu 
+            <input class="radio" type="radio" name="searchType" <?php if ($finnish_to_sami == true) { echo "checked" ; }?> value="finnish_to_sami">Haku suomeksi 
+            <input class="radio" type="radio" name="searchType" <?php if ($sami_to_finnish == true) { echo "checked" ; }?> value="sami_to_finnish">Oza sámegillii
+            </div>
+            </div>
         </form>
         <?php if (!empty($searchResults)): ?>
         <h2 class="search-page-text">Hakutulokset - Ohcubohtosat</h2>
