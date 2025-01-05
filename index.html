@@ -3,6 +3,7 @@ header("X-Frame-Options: DENY");
 header("Content-Type: text/html");
 header("X-Content-Type-Options: nosniff");
 header("Cross-Origin-Resource-Policy: same-origin");
+header("Referrer-Policy: origin-when-cross-origin");
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
@@ -21,6 +22,10 @@ $searchResults = [];
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $searchType = $_POST['searchType'];
     $query = sanitizeInput($_POST['query']);
+    $query = trim($query);
+    $query = preg_replace('/\s+/', '', $query);
+    $searchType = trim($searchType);
+    $searchType = preg_replace('/\s+/', '', $searchType);
 
     if (!empty($query)) {
         switch ($searchType) {
@@ -211,6 +216,7 @@ if (isset($_POST['searchType']) && $searchType == "full_text") {
 
         .search-page-text {
             color: white;
+            text-decoration: none;
         }
 
         .searchbox {
@@ -228,27 +234,6 @@ if (isset($_POST['searchType']) && $searchType == "full_text") {
         #query {
             width: 70%;
         }
-/*
-        .searchbox {
-            position: relative;
-        }
-
-        #query {
-            width: 100%;
-        }
-
-        #submit {
-            width: 21px;
-            height: 21px;
-            background-image: url('searchicon.png');
-            z-index: 2;
-        } 
-
-        .searchbox submit {
-            position: absolute;
-            position: top-right;
-            z-index: 2;
-        } */
 
         .radiorow {
             float: left;
@@ -269,7 +254,6 @@ if (isset($_POST['searchType']) && $searchType == "full_text") {
     </header>
     <main>
         <form method="POST">
-            <!-- <label for="query" class="search-page-text">Hae - Oza</label> -->
             <div class="searchbox">
             <input type="text" id="query" name="query" placeholder="hakusana/ohcansátni..." required autofocus>
             <input type="submit" id="submit" value="Hae - Oza">
@@ -294,7 +278,7 @@ if (isset($_POST['searchType']) && $searchType == "full_text") {
         <?php endif; ?>
     </main>
     <footer>
-        <p>© 2025 - skuolfi.org</p>
+        <p class="search-page-text">© 2025 - skuolfi.org | <a class="search-page-text" href="https://github.com/guovza/satnegirji.www">Source code</a>
     </footer>
 </body>
 </html>
