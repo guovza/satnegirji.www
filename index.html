@@ -13,41 +13,54 @@ $db = new SQLite3('/var/www/db/satnegirji.db');
 // Function to sanitize user input
 // To prevent SQL injections, we use prepared statements, not this function
 function sanitizeInput($input) {
-    $input = str_replace(";", "", $input);
-    $input = str_replace("'", "", $input);
-    $input = trim($input);
-    $input = preg_replace('/\s+/', '', $input);
+    $input = SQLite3::escapeString($input);
     return $input;
+}
+// Allow only letters/characters used in Finnish and Northern Sámi languages
+// to prevent errors in FTS5 full text search 
+function sanitizeInputForSearch(string $input): string {
+    // Define the pattern for allowed characters
+    $pattern = '/[^a-zA-ZåäöčđŋšŧžáÅÄÖČĐŊŠŦŽÁ*]/u'; // Negated character set
+    // Remove all characters not in the allowed set
+    return preg_replace($pattern, '', $input);
 }
 // Function to replace user submitted * wildcard with sql compatible % character
 function enableWildcard($input) {
     $input = str_replace("*", "%", $input);
     return $input;
 }
+function escapeForFts5(string $input): string {
+    // Replace any double quotes in the input with two double quotes to escape them
+    // and prevent any use of logical operators AND, OR and NOT, FTS5
+    return '"' . str_replace('"', '""', $input) . '"';
+}
 // Search logic
 $searchResults = [];
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $searchType = sanitizeInput($_POST['searchType']);
     $query = sanitizeInput($_POST['query']);
+    $query = sanitizeInputForSearch($query);
     $query = enableWildcard($query);
     if (!empty($query)) {
         switch ($searchType) {
             case 'finnish_to_sami':
-                $sql = "SELECT DISTINCT suomi AS 'Suomi', saame AS 'Sápmi' FROM skirja WHERE suomi LIKE :query ORDER BY suomi LIMIT 1000;";
+                $sql = "SELECT DISTINCT suomi AS 'Suomi', saame AS 'Sápmi' FROM skirja WHERE suomi LIKE :userquery ORDER BY suomi LIMIT 1000;";
                 break;
             case 'sami_to_finnish':
-                $sql = "SELECT DISTINCT suomi AS 'Suomi', saame AS 'Sápmi' FROM skirja WHERE saame LIKE :query ORDER BY saame LIMIT 1000;";
+                $sql = "SELECT DISTINCT suomi AS 'Suomi', saame AS 'Sápmi' FROM skirja WHERE saame LIKE :userquery ORDER BY saame LIMIT 1000;";
                 break;
             case 'full_text':
                 // Remove wildcard from FTS5 full text search 
                 $query = str_replace("%", "", $query);
-                $sql = "SELECT DISTINCT suomi as 'Suomi',saame as 'Sápmi' FROM suomisaame WHERE suomisaame match :query AND rank MATCH 'bm25(10.0, 5.0)' ORDER BY rank limit 1000;";
+                $query = escapeForFts5($query);
+                $sql = "SELECT DISTINCT suomi as 'Suomi',saame as 'Sápmi' FROM suomisaame WHERE suomisaame match :userquery AND rank MATCH 'bm25(10.0, 5.0)' ORDER BY rank limit 1000;";
                 break;
             default:
                 // Remove wildcard from FTS5 full text search 
                 // Default search option is full text search 
                 $query = str_replace("%", "", $query);
-                $sql = "SELECT DISTINCT suomi as 'Suomi',saame as 'Sápmi' FROM suomisaame WHERE suomisaame match :query AND rank MATCH 'bm25(10.0, 5.0)' ORDER BY rank limit 1000;";
+                $query = escapeForFts5($query);
+                $sql = "SELECT DISTINCT suomi as 'Suomi',saame as 'Sápmi' FROM suomisaame WHERE suomisaame match :userquery AND rank MATCH 'bm25(10.0, 5.0)' ORDER BY rank limit 1000;";
         }
         if ($sql) {
             // Log the query and parameter values for debugging
@@ -60,7 +73,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 die("Failed to prepare statement: " . $db->lastErrorMsg());
             }
             // Bind user submitted value as data 
-            $stmt->bindValue(':query', $query, SQLITE3_TEXT);
+            $stmt->bindValue(':userquery', $query, SQLITE3_TEXT);
             // Execute SQL query
             $result = $stmt->execute();
             // Fetch the result set if any
