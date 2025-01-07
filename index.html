@@ -11,16 +11,18 @@ error_reporting(E_ALL);
 // Connect to SQLite database
 $db = new SQLite3('/var/www/db/satnegirji.db');
 // Function to sanitize user input
-// To prevent SQL injections, we use prepared statements, not this function
+// To prevent SQL injections, we use prepared statements, not these functions
 function sanitizeInput($input) {
     $input = SQLite3::escapeString($input);
+    $input = trim($input);
+    $input = preg_replace('/\s+/', '', $input);
     return $input;
 }
-// Allow only letters/characters used in Finnish and Northern Sámi languages
+// Allow only letters/characters used in Finnish, Swedish, Norwegian and Northern Sámi languages
 // to prevent errors in FTS5 full text search 
 function sanitizeInputForSearch(string $input): string {
     // Define the pattern for allowed characters
-    $pattern = '/[^a-zA-ZåäöčđŋšŧžáÅÄÖČĐŊŠŦŽÁ*]/u'; // Negated character set
+    $pattern = '/[^a-zA-ZåäöčđŋšŧžáøæéàüÅÄÖČĐŊŠŦŽÁØÆÉÀÜ*]/u'; // Negated character set
     // Remove all characters not in the allowed set
     return preg_replace($pattern, '', $input);
 }
@@ -29,7 +31,13 @@ function enableWildcard($input) {
     $input = str_replace("*", "%", $input);
     return $input;
 }
-function escapeForFts5(string $input): string {
+// Function to remove user submitted * wildcard and sql compatible % character
+function disableWildcard($input) {
+    $input = str_replace("*", "", $input);
+    $input = str_replace("%", "", $input);
+    return $input;
+}
+function escapeForFTS5(string $input): string {
     // Replace any double quotes in the input with two double quotes to escape them
     // and prevent any use of logical operators AND, OR and NOT, FTS5
     return '"' . str_replace('"', '""', $input) . '"';
@@ -51,15 +59,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 break;
             case 'full_text':
                 // Remove wildcard from FTS5 full text search 
-                $query = str_replace("%", "", $query);
-                $query = escapeForFts5($query);
+                $query = disableWildcard($query);
+                $query = escapeForFTS5($query);
                 $sql = "SELECT DISTINCT suomi as 'Suomi',saame as 'Sápmi' FROM suomisaame WHERE suomisaame match :userquery AND rank MATCH 'bm25(10.0, 5.0)' ORDER BY rank limit 1000;";
                 break;
             default:
                 // Remove wildcard from FTS5 full text search 
                 // Default search option is full text search 
-                $query = str_replace("%", "", $query);
-                $query = escapeForFts5($query);
+                $query = disableWildcard($query);
+                $query = escapeForFTS5($query);
                 $sql = "SELECT DISTINCT suomi as 'Suomi',saame as 'Sápmi' FROM suomisaame WHERE suomisaame match :userquery AND rank MATCH 'bm25(10.0, 5.0)' ORDER BY rank limit 1000;";
         }
         if ($sql) {
