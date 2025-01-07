@@ -11,7 +11,7 @@ $db = new SQLite3('/var/www/db/satnegirji.db');
 </code>
 </pre>
 
-I'll suggest you to make sure your webserver is configured properly and securely. I'll also suggest you to make sure your webserver sends some additional security related http headers. With Apache, you may put the below to your Apache confoguration (modify the domain skuolfi.org to suite your domain):
+I'll suggest you to make sure your webserver is configured properly and securely. I'll also suggest you to make sure your webserver sends some additional security related http headers. With Apache, you may put the below to your Apache configuration (modify the domain skuolfi.org to suite your own domain):
 
 <pre>
 <code>
