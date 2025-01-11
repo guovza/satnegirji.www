@@ -1,5 +1,7 @@
 Web-version of Suoma-Sáme-Suoma sátnegirji with PHP and SQLite.
 
+The web app is very lightweight and runs well and fast for example on Raspberry Pii as I do at home.
+
 You'll also need the latest <a href="https://github.com/guovza/satnegirji.db">satnegirji.db</a> SQLite database. Put it somewhere outside your web ducument root. Webserver process need to have access to it anyway. 
 
 Modify the $db variable to suite your configuration:
@@ -11,7 +13,9 @@ $db = new SQLite3('/var/www/db/satnegirji.db');
 </code>
 </pre>
 
-I'll suggest you to make sure your webserver is configured properly and securely. I'll also suggest you to make sure your webserver sends some additional security related http headers. With Apache, you may put the below to your Apache configuration (modify the domain skuolfi.org to suite your own domain):
+I'll suggest you to make sure your webserver is configured properly and securely. Also modify your webserver to run *.html files as PHP files or rename index.html file as index.php file.
+
+I'll also suggest you to make sure your webserver sends some additional security related http headers. With Apache, you may put the below to your Apache configuration (modify the domain skuolfi.org to suite your own domain):
 
 <pre>
 <code>
