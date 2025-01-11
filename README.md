@@ -26,3 +26,11 @@ Header always set Referrer-Policy: origin-when-cross-origin
 </IfModule>
 </code>
 </pre>
+
+I'll also suggest you to force https connection. With Apache web-server, you can put this to your conficuration (modify to suite your server):
+
+<pre>
+<code>
+Redirect permanent / https://your.dictionary.server/
+</code>
+</pre>
