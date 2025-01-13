@@ -4,5 +4,5 @@ First version by Kristian Guttorm, Tapio Ryhänen and Visa Ryhänen with the hel
 
 Please, contribute!
 
-Dedicated to the memory of "Rico" Richard Kristian Guttorm (1972-1999). Never forget.
+Dedicated to the memory of "Rico" Richard Kristian Guttorm (1972-1999).
 
