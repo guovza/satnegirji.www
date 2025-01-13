@@ -15,6 +15,7 @@ $db = new SQLite3('/var/www/db/satnegirji.db');
 function sanitizeInput($input) {
     $input = SQLite3::escapeString($input);
     $input = trim($input);
+    $input = preg_quote($input);
     $input = preg_replace('/\s+/', '', $input);
     return $input;
 }
