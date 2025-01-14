@@ -9,13 +9,13 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 // Connect to SQLite database
-$db = new SQLite3('/var/www/db/satnegirji.db');
+//$db = new SQLite3('/var/www/db/satnegirji.db');
+$db = new SQLite3('/home/muaybora/db/satnegirji.db');
 // Function to sanitize user input
 // To prevent SQL injections, we use prepared statements, not these functions
 function sanitizeInput($input) {
     $input = SQLite3::escapeString($input);
     $input = trim($input);
-    $input = preg_quote($input);
     $input = preg_replace('/\s+/', '', $input);
     return $input;
 }
@@ -300,7 +300,7 @@ if (isset($_POST['searchType']) && $searchType == "full_text") {
             </div>
         </form>
         <?php if (!empty($searchResults)): ?>
-        <h2 class="search-page-text">Hakutulokset - Ohcubohtosat</h2>
+        <h2 class="search-page-text">Hakutulokset - Ohcanbohtosat</h2>
         <?php foreach ($searchResults as $row): ?>
         <p class="search-page-text">
         <b>Suomi:</b> <?= htmlspecialchars($row['Suomi']) ?>
@@ -309,7 +309,7 @@ if (isset($_POST['searchType']) && $searchType == "full_text") {
         </p>
         <?php endforeach; ?>
         <?php elseif ($_SERVER['REQUEST_METHOD'] === 'POST'): ?>
-        <p class="search-page-text">Ei hakutuloksia - Ii ohcubohtosiid</p>
+        <p class="search-page-text">Ei hakutuloksia - Eai ohcanbohtosat</p>
         <?php endif; ?>
     </main>
     <footer>
