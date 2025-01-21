@@ -37,3 +37,5 @@ I'll also suggest you to force https connection. With Apache web-server, you can
 Redirect permanent / https://your.dictionary.server/
 </code>
 </pre>
+
+Modify the security.txt as needeed and place it on https://your.dictionary.server/.well-known/security.txt
