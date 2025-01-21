@@ -24,7 +24,7 @@ Header always set Strict-Transport-Security: "max-age=63072000; includeSubDomain
 Header always set X-Content-Type-Options: "nosniff"
 Header always set X-Frame-Options: "DENY"
 header always set Cross-Origin-Resource-Policy: "default-src 'self';"
-Header always set Content-Security-Policy: "default-src 'self'; script-src 'self'; connect-src 'self';style-src 'self';base-uri 'self' satnegirji.skuolfi.org;frame-src 'self';frame-ancestors 'self';form-action 'self';upgrade-insecure-requests;img-src 'self' data:"
+Header always set Content-Security-Policy: "default-src 'self'; script-src 'self'; connect-src 'self';style-src 'self';base-uri 'self' https://satnegirji.skuolfi.org;frame-src 'self';frame-ancestors 'self';form-action 'self';upgrade-insecure-requests;img-src 'self' data:"
 Header always set Referrer-Policy: same-origin
 </IfModule>
 </code>
