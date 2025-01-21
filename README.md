@@ -23,10 +23,9 @@ I'll also suggest you to make sure your webserver sends some additional security
 Header always set Strict-Transport-Security: "max-age=63072000; includeSubDomains; preload"
 Header always set X-Content-Type-Options: "nosniff"
 Header always set X-Frame-Options: "DENY"
-header always set Cross-Origin-Resource-Policy: same-origin
-header always set Content-Security-Policy: "default-src 'self'; img-src 'self' skuolfi.org *.skuolfi.org; style-src 'self'"
-Header always set Content-Security-Policy "frame-ancestors 'self';"
-Header always set Referrer-Policy: origin-when-cross-origin
+header always set Cross-Origin-Resource-Policy: "default-src 'self';"
+Header always set Content-Security-Policy: "default-src 'self'; script-src 'self'; connect-src 'self';style-src 'self';base-uri 'self' satnegirji.skuolfi.org;frame-src 'self';frame-ancestors 'self';form-action 'self';upgrade-insecure-requests;img-src 'self' data:"
+Header always set Referrer-Policy: same-origin
 </IfModule>
 </code>
 </pre>
