@@ -1,5 +1,4 @@
-You may contact me at the address skuolfi.relay980@passmail.net
-
-If you find any bugs or security problems on my webapp, please just contact me.
-
-Eatnat giitu. Thanks. 
+Contact: mailto:skuolfi.relay980@passmail.net
+Expires: 2026-01-01T12:00:00.000Z
+Canonical: https://satnegirji.skuolfi.org/.well-known/security.txt
+Policy: Please, report bugs and security problems to skuolfi.relay980@passmail.net Eatnat giitu / Many thanks
