@@ -1,4 +1,4 @@
-Web-version of Suoma-Sáme-Suoma sátnegirji with PHP and SQLite.
+Web-version of Suoma-Sáme-Suoma sátnegirji with PHP and SQLite. This version is under development and will be published during year 2025. The search already works quite well but some additional features are still in progress.
 
 The web app is very lightweight and runs well and fast for example on Raspberry Pii as I do at home.
 
