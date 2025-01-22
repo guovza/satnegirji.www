@@ -1,147 +1,147 @@
-        body {
-            margin: 0;
-            background-color: #000;
-            /* Fallback color */
-            background-image: url('image2-mobile.webp');
-            /* Default mobile background */
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
-            font-family: sans-serif;
-        }
+body {
+    margin: 0;
+    background-color: #000;
+    /* Fallback color */
+    background-image: url('image2-mobile.webp');
+    /* Default mobile background */
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    font-family: sans-serif;
+}
 
-        /* Tablet Screens */
-        @media (min-width: 768px) {
-            body {
-                background-image: url('image2-tablet.webp');
-            }
-        }
+/* Tablet Screens */
+@media (min-width: 768px) {
+    body {
+        background-image: url('image2-tablet.webp');
+    }
+}
 
-        /* Desktop Screens */
-        @media (min-width: 1024px) {
-            body {
-                background-image: url('image2-desktop.webp');
-            }
-        }
+/* Desktop Screens */
+@media (min-width: 1024px) {
+    body {
+        background-image: url('image2-desktop.webp');
+    }
+}
 
-        /* Fallback for browsers without WebP support */
-        body {
-            background-image: url('image2-mobile.jpg');
-        }
+/* Fallback for browsers without WebP support */
+body {
+    background-image: url('image2-mobile.jpg');
+}
 
-        @media (min-width: 768px) {
-            body {
-                background-image: url('image2-tablet.jpg');
-            }
-        }
+@media (min-width: 768px) {
+    body {
+        background-image: url('image2-tablet.jpg');
+    }
+}
 
-        @media (min-width: 1024px) {
-            body {
-                background-image: url('image2-desktop.jpg');
-            }
-        }
+@media (min-width: 1024px) {
+    body {
+        background-image: url('image2-desktop.jpg');
+    }
+}
 
-        header {
-            background: rgp(225, 230, 235);
-            padding: 1em;
-            text-align: center;
-            color: white;
-        }
+header {
+    background: rgp(225, 230, 235);
+    padding: 1em;
+    text-align: center;
+    color: white;
+}
 
-        main {
-            padding: 2em;
-            max-width: 800px;
-            margin: auto;
-            /* background: rgb(167, 199, 245); */
-            background: rgb(131, 101, 91, 0.8);
-            /* opacity: 0.8; */
-            border-radius: 30px;
-        }
+main {
+    padding: 2em;
+    max-width: 800px;
+    margin: auto;
+    /* background: rgb(167, 199, 245); */
+    background: rgb(131, 101, 91, 0.8);
+    /* opacity: 0.8; */
+    border-radius: 30px;
+}
 
-        h1 {
-            color: #0f1012;
-        }
+h1 {
+    color: #0f1012;
+}
 
-        form { 
-            display: flex;
-            flex-direction: column;
-            gap: 1em;
-        }
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+}
 
-        #searchType {
-            color: black;
-        }
+#searchType {
+    color: black;
+}
 
-        submit {
-            color: #0f1012;
-        }
+submit {
+    color: #0f1012;
+}
 
-        select,
-        input[type="text"],
-        input[type="submit"] {
-            padding: 0.5em;
-            font-size: 1em;
-            color: #0f1012;
-            border-radius: 20px;
-            outline: none;
-        }
+select,
+input[type="text"],
+input[type="submit"] {
+    padding: 0.5em;
+    font-size: 1em;
+    color: #0f1012;
+    border-radius: 20px;
+    outline: none;
+}
 
-        input[type="text"] {
-            font-size: 16px;
-            background-color: white;
-            background-image: url('searchicon.png');
-            background-position: 10px 10px; 
-            background-repeat: no-repeat;
-            padding: 12px 20px 12px 40px;
-        }
+input[type="text"] {
+    font-size: 16px;
+    background-color: white;
+    background-image: url('searchicon.png');
+    background-position: 10px 10px;
+    background-repeat: no-repeat;
+    padding: 12px 20px 12px 40px;
+}
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 2em;
-        }
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 2em;
+}
 
-        th,
-        td {
-            padding: 0.5em;
-            text-align: left;
-            border: 1px solid #ddd;
-        }
+th,
+td {
+    padding: 0.5em;
+    text-align: left;
+    border: 1px solid #ddd;
+}
 
-        th {
-            background-color: white;
-            color: white;
-        }
+th {
+    background-color: white;
+    color: white;
+}
 
-        .search-page-text {
-            color: white;
-            text-decoration: none;
-        }
+.search-page-text {
+    color: white;
+    text-decoration: none;
+}
 
-        .searchbox {
-            width: 100%;
-        }
+.searchbox {
+    width: 100%;
+}
 
-        #submit {
-            color: white;
-            background-color: rgb(197, 191, 177, 0.5);
-            border-color: rgb(197, 191, 177, 0.5);
-            outline: none;
-            position: right;
-        }
+#submit {
+    color: white;
+    background-color: rgb(197, 191, 177, 0.5);
+    border-color: rgb(197, 191, 177, 0.5);
+    outline: none;
+    position: right;
+}
 
-        #query {
-            width: 70%;
-        }
+#query {
+    width: 70%;
+}
 
-        .radiorow {
-            float: left;
-            color: white;
-        }
+.radiorow {
+    float: left;
+    color: white;
+}
 
-        footer {
-            text-align: center;
-            padding: 1em;
-            background: rgp(225, 230, 235);
-            color: white;
-        }
+footer {
+    text-align: center;
+    padding: 1em;
+    background: rgp(225, 230, 235);
+    color: white;
+}
