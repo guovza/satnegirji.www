@@ -1,0 +1,172 @@
+<?php
+header("X-Frame-Options: DENY");
+header("Content-Type: text/html");
+header("X-Content-Type-Options: nosniff");
+header("Cross-Origin-Resource-Policy: same-origin");
+header("Referrer-Policy: origin-when-cross-origin");
+// On production, turn these errors off ie. 0
+ini_set('display_errors', 0);
+ini_set('display_startup_errors', 0);
+error_reporting(E_ALL);
+// Connect to SQLite database
+//$db = new SQLite3('/var/www/db/satnegirji.db');
+$db = new SQLite3('/home/muaybora/db/satnegirji.db');
+// Function to sanitize user input
+// To prevent SQL injections, we use prepared statements, not these functions
+function sanitizeInput($input) {
+    $input = SQLite3::escapeString($input);
+    $input = preg_quote($input);
+    $input = trim($input);
+    $input = preg_replace('/\s+/', '', $input);
+    return $input;
+}
+// Allow only letters/characters used in Finnish, Swedish, Norwegian and Northern Sámi languages
+// to prevent errors in FTS5 full text search 
+function sanitizeInputForSearch(string $input): string {
+    // Define the pattern for allowed characters
+    $pattern = '/[^a-zA-ZåäöčđŋšŧžáøæéàüÅÄÖČĐŊŠŦŽÁØÆÉÀÜ*]/u'; // Negated character set
+    // Remove all characters not in the allowed set
+    return preg_replace($pattern, '', $input);
+}
+// Function to replace user submitted * wildcard with sql compatible % character
+function enableWildcard($input) {
+    $input = str_replace("*", "%", $input);
+    return $input;
+}
+// Function to remove user submitted * wildcard and sql compatible % character
+function disableWildcard($input) {
+    $input = str_replace("*", "", $input);
+    $input = str_replace("%", "", $input);
+    return $input;
+}
+function escapeForFTS5(string $input): string {
+    // Replace any double quotes in the input with two double quotes to escape them
+    // and prevent any use of logical operators AND, OR and NOT, FTS5
+    return '"' . str_replace('"', '""', $input) . '"';
+}
+// Search logic
+$searchResults = [];
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $searchType = sanitizeInput($_POST['searchType']);
+    $query = sanitizeInput($_POST['query']);
+    $query = sanitizeInputForSearch($query);
+    $query = enableWildcard($query);
+    if (!empty($query)) {
+        switch ($searchType) {
+            case 'finnish_to_sami':
+                $sql = "SELECT DISTINCT suomi AS 'Suomi', saame AS 'Sápmi' FROM skirja WHERE suomi LIKE :userquery ORDER BY suomi LIMIT 1000;";
+                break;
+            case 'sami_to_finnish':
+                $sql = "SELECT DISTINCT suomi AS 'Suomi', saame AS 'Sápmi' FROM skirja WHERE saame LIKE :userquery ORDER BY saame LIMIT 1000;";
+                break;
+            case 'full_text':
+                // Remove wildcard from FTS5 full text search 
+                $query = disableWildcard($query);
+                $query = escapeForFTS5($query);
+                $sql = "SELECT DISTINCT suomi as 'Suomi',saame as 'Sápmi' FROM suomisaame WHERE suomisaame match :userquery AND rank MATCH 'bm25(10.0, 5.0)' ORDER BY rank limit 1000;";
+                break;
+            default:
+                // Remove wildcard from FTS5 full text search 
+                // Default search option is full text search 
+                $query = disableWildcard($query);
+                $query = escapeForFTS5($query);
+                $sql = "SELECT DISTINCT suomi as 'Suomi',saame as 'Sápmi' FROM suomisaame WHERE suomisaame match :userquery AND rank MATCH 'bm25(10.0, 5.0)' ORDER BY rank limit 1000;";
+        }
+        if ($sql) {
+            // Log the query and parameter values for debugging
+            // On production, comment these off
+            //error_log("SQL: $sql");
+            //error_log("Query: " . '%' . $query . '%');        
+            // Prepare sql statement 
+            $stmt = $db->prepare($sql);
+            if (!$stmt) {
+                die("Failed to prepare statement: " . $db->lastErrorMsg());
+            }
+            // Bind user submitted value as data 
+            $stmt->bindValue(':userquery', $query, SQLITE3_TEXT);
+            // Execute SQL query
+            $result = $stmt->execute();
+            // Fetch the result set if any
+            if (!$result) {
+                die("Query execution failed: " . $db->lastErrorMsg());
+            }
+            while ($row = $result->fetchArray(SQLITE3_ASSOC)) {
+                $searchResults[] = $row;
+            }
+        } else {
+            die("No valid SQL query to execute.");
+        }
+    }
+}
+// Initialize the searchType variables
+$finnish_to_sami = false;
+$sami_to_finnish = false;
+$full_text = false;
+if (empty($searchType)) {
+    $full_text = true;
+}
+if (isset($_POST['searchType']) && $searchType == "finnish_to_sami") {
+    $finnish_to_sami = true;
+}
+if (isset($_POST['searchType']) && $searchType == "sami_to_finnish") {
+    $sami_to_finnish = true;
+}
+if (isset($_POST['searchType']) && $searchType == "full_text") {
+    $full_text = true;
+}
+?>
+<!DOCTYPE html>
+<html>
+<!--
+//
+// This work is licensed under
+// Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International.
+// To view a copy of this license,
+// please visit https://creativecommons.org/licenses/by-nc-sa/4.0/
+// Dedicated to the memory of Kristian "Rico" Guttorm (1972-1999).
+//
+-->
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Suoma-Davvisáme-Suoma sátnegirji - Suomi-pohjoissaame-suomi sanakirja">
+    <meta name="keywords" content="suomi, saame, pohjoissaame, suomagiella, sáme, sámegiella, davvisáme, davvisámegiella, sanakirja, sátnegirji, suomi-pohjoissaame-suomi, Suoma-Davvisáme-Suoma, Suopma, Sápmi">
+    <title>Suoma-Davvisáme-Suoma sátnegirji</title>
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="stylesheet" href="satnegirji.css">
+</head>
+<body>
+    <header>
+        <h1>Suoma-Davvisáme-Suoma sátnegirji</h1>
+    </header>
+    <main>
+        <form method="POST">
+            <div class="searchbox">
+            <input type="text" id="query" name="query" placeholder="hakusana/ohcansátni..." required autofocus>
+            <input type="submit" id="submit" value="Hae - Oza">
+            </div>
+            <div class="radiorow">
+            <input class="radio" type="radio" name="searchType" <?php if ($full_text == true) { echo "checked" ; }?> value="full_text">Kokotekstihaku - Ollesdeakstaohcu 
+            <input class="radio" type="radio" name="searchType" <?php if ($finnish_to_sami == true) { echo "checked" ; }?> value="finnish_to_sami">Haku suomeksi 
+            <input class="radio" type="radio" name="searchType" <?php if ($sami_to_finnish == true) { echo "checked" ; }?> value="sami_to_finnish">Oza sámegillii
+            </div>
+        </form>
+        <?php if (!empty($searchResults)): ?>
+        <h2 class="search-page-text">Hakutulokset - Ohcanbohtosat</h2>
+        <?php foreach ($searchResults as $row): ?>
+        <p class="search-page-text">
+        <b>Suomi:</b> <?= htmlspecialchars($row['Suomi']) ?>
+        <br>
+        <b>Sápmi:</b> <?= htmlspecialchars($row['Sápmi']) ?>
+        </p>
+        <?php endforeach; ?>
+        <?php elseif ($_SERVER['REQUEST_METHOD'] === 'POST'): ?>
+        <p class="search-page-text">Ei hakutuloksia - Eai ohcanbohtosat</p>
+        <?php endif; ?>
+    </main>
+    <footer>
+        <p class="search-page-text">© 2025 - skuolfi.org | <a class="search-page-text" href="https://github.com/guovza/satnegirji.www">Source code</a>
+    </footer>
+</body>
+</html>
