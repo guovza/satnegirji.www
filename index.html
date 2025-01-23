@@ -9,8 +9,8 @@ ini_set('display_errors', 0);
 ini_set('display_startup_errors', 0);
 error_reporting(E_ALL);
 // Connect to SQLite database
-//$db = new SQLite3('/var/www/db/satnegirji.db');
-$db = new SQLite3('/home/muaybora/db/satnegirji.db');
+$db = new SQLite3('/var/www/db/satnegirji.db');
+//$db = new SQLite3('/home/muaybora/db/satnegirji.db');
 // Function to sanitize user input
 // To prevent SQL injections, we use prepared statements, not these functions
 function sanitizeInput($input) {
@@ -134,7 +134,7 @@ if (isset($_POST['searchType']) && $searchType == "full_text") {
     <meta name="keywords" content="suomi, saame, pohjoissaame, suomagiella, sáme, sámegiella, davvisáme, davvisámegiella, sanakirja, sátnegirji, suomi-pohjoissaame-suomi, Suoma-Davvisáme-Suoma, Suopma, Sápmi">
     <title>Suoma-Davvisáme-Suoma sátnegirji</title>
     <link rel="icon" type="image/x-icon" href="favicon.ico">
-    <link rel="stylesheet" href="satnegirji.css">
+    <link rel="stylesheet" href="satnegirji4.css">
 </head>
 <body>
     <header>
