@@ -6,3 +6,6 @@ Please, contribute!
 
 Dedicated to the memory of "Rico" Richard Kristian Guttorm (1972-1999).
 
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
