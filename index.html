@@ -24,8 +24,8 @@ function sanitizeInput($input) {
     return $input;
 }
 // Allow only letters/characters used in Finnish, Swedish, Norwegian and Northern Sámi languages
-// to prevent errors in FTS5 full text search plus wildcard character *
-// and - and ' characters
+// plus wildcard character * and - and ' characters
+// to prevent errors in FTS5 full text search plus wildcard character * 
 function sanitizeInputForSearch(string $input): string {
     // Define the pattern for allowed characters
     $pattern = '/[^a-zA-ZåäöčđŋšŧžáøæéàüÅÄÖČĐŊŠŦŽÁØÆÉÀÜ*\'-]/u'; // Negated character set
