@@ -1,10 +1,13 @@
 <?php
+// It's always better to configure your webserver to send these http headers
+// In that case, you can remove these header lines below
 header("X-Frame-Options: DENY");
 header("Content-Type: text/html");
 header("X-Content-Type-Options: nosniff");
 header("Cross-Origin-Resource-Policy: same-origin");
 header("Referrer-Policy: origin-when-cross-origin");
-// On production, turn these errors off ie. 0
+// On production, turn these off ie. 0
+ini_set('log_errors', '0');
 ini_set('display_errors', 0);
 ini_set('display_startup_errors', 0);
 error_reporting(E_ALL);
@@ -14,17 +17,18 @@ $db = new SQLite3('/var/www/db/satnegirji.db');
 // Function to sanitize user input
 // To prevent SQL injections, we use prepared statements, not these functions
 function sanitizeInput($input) {
-    $input = SQLite3::escapeString($input);
-    $input = preg_quote($input);
+    //$input = SQLite3::escapeString($input);
+    //$input = preg_quote($input);
     $input = trim($input);
     $input = preg_replace('/\s+/', '', $input);
     return $input;
 }
 // Allow only letters/characters used in Finnish, Swedish, Norwegian and Northern Sámi languages
-// to prevent errors in FTS5 full text search 
+// to prevent errors in FTS5 full text search plus wildcard character *
+// and - and ' characters
 function sanitizeInputForSearch(string $input): string {
     // Define the pattern for allowed characters
-    $pattern = '/[^a-zA-ZåäöčđŋšŧžáøæéàüÅÄÖČĐŊŠŦŽÁØÆÉÀÜ*]/u'; // Negated character set
+    $pattern = '/[^a-zA-ZåäöčđŋšŧžáøæéàüÅÄÖČĐŊŠŦŽÁØÆÉÀÜ*\'-]/u'; // Negated character set
     // Remove all characters not in the allowed set
     return preg_replace($pattern, '', $input);
 }
@@ -46,8 +50,16 @@ function escapeForFTS5(string $input): string {
 }
 // Search logic
 $searchResults = [];
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $searchType = sanitizeInput($_POST['searchType']);
+//if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+//    $searchType = sanitizeInput($_POST['searchType']);
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $searchType = $_POST['searchType'] ?? 'full_text';
+        $query = $_POST['query'] ?? '';
+    // Validate searchType variable
+    $validSearchTypes = ['finnish_to_sami', 'sami_to_finnish', 'full_text'];
+    if (!in_array($searchType, $validSearchTypes)) {
+        $searchType = 'full_text';
+    }
     $query = sanitizeInput($_POST['query']);
     $query = sanitizeInputForSearch($query);
     $query = enableWildcard($query);
@@ -80,7 +92,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Prepare sql statement 
             $stmt = $db->prepare($sql);
             if (!$stmt) {
-                die("Failed to prepare statement: " . $db->lastErrorMsg());
+                error_log("Failed to prepare statement: " . $db->lastErrorMsg());
+                exit;
             }
             // Bind user submitted value as data 
             $stmt->bindValue(':userquery', $query, SQLITE3_TEXT);
@@ -88,32 +101,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $result = $stmt->execute();
             // Fetch the result set if any
             if (!$result) {
-                die("Query execution failed: " . $db->lastErrorMsg());
+                error_log("Query execution failed: " . $db->lastErrorMsg());
+                exit;
             }
             while ($row = $result->fetchArray(SQLITE3_ASSOC)) {
                 $searchResults[] = $row;
             }
         } else {
-            die("No valid SQL query to execute.");
+                error_log("No valid SQL query to execute.");
+                exit;
         }
     }
 }
 // Initialize the searchType variables
-$finnish_to_sami = false;
-$sami_to_finnish = false;
-$full_text = false;
-if (empty($searchType)) {
-    $full_text = true;
-}
-if (isset($_POST['searchType']) && $searchType == "finnish_to_sami") {
-    $finnish_to_sami = true;
-}
-if (isset($_POST['searchType']) && $searchType == "sami_to_finnish") {
-    $sami_to_finnish = true;
-}
-if (isset($_POST['searchType']) && $searchType == "full_text") {
-    $full_text = true;
-}
+$finnish_to_sami = $searchType === 'finnish_to_sami';
+$sami_to_finnish = $searchType === 'sami_to_finnish';
+$full_text = $searchType === 'full_text';
 ?>
 <!DOCTYPE html>
 <html>
@@ -149,7 +152,7 @@ if (isset($_POST['searchType']) && $searchType == "full_text") {
             <div class="radiorow">
             <input class="radio" type="radio" name="searchType" <?php if ($full_text == true) { echo "checked" ; }?> value="full_text">Kokotekstihaku - Ollesdeakstaohcu 
             <input class="radio" type="radio" name="searchType" <?php if ($finnish_to_sami == true) { echo "checked" ; }?> value="finnish_to_sami">Haku suomeksi 
-            <input class="radio" type="radio" name="searchType" <?php if ($sami_to_finnish == true) { echo "checked" ; }?> value="sami_to_finnish">Oza sámegillii
+            <input class="radio" type="radio" name="searchType" <?php if ($sami_to_finnish == true) { echo "checked" ; }?> value="sami_to_finnish">Oza sámegillii 
             </div>
         </form>
         <?php if (!empty($searchResults)): ?>
