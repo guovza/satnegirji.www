@@ -12,8 +12,8 @@ ini_set('display_errors', 0);
 ini_set('display_startup_errors', 0);
 error_reporting(E_ALL);
 // Connect to SQLite database
-$db = new SQLite3('/var/www/db/satnegirji.db');
-//$db = new SQLite3('/home/muaybora/db/satnegirji.db');
+//$db = new SQLite3('/var/www/db/satnegirji.db');
+$db = new SQLite3('/home/muaybora/db/satnegirji.db');
 // Function to sanitize user input
 // To prevent SQL injections, we use prepared statements, not these functions
 function sanitizeInput($input) {
@@ -169,7 +169,7 @@ $full_text = $searchType === 'full_text';
         <?php endif; ?>
     </main>
     <footer>
-        <p class="search-page-text">© 2025 - skuolfi.org | <a class="search-page-text" href="https://github.com/guovza/satnegirji.www">Source code</a>
+        <p class="search-page-text">© 2025 - skuolfi.org | <a class="search-page-text" href="https://github.com/guovza/satnegirji.www" target="_blank">Source code</a> | <a class="search-page-text" href="https://github.com/guovza/satnegirji.www/wiki" target="_blank">Rávvagiid</a> | <a class="search-page-text" href="https://github.com/guovza/satnegirji.www/wiki" target="_blank">Ohjeita</a></p>
     </footer>
 </body>
 </html>
