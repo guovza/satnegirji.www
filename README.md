@@ -2,6 +2,10 @@ Web-version of Suoma-Sáme-Suoma sátnegirji with PHP and SQLite. This version i
 
 The web app is very lightweight and runs well and fast for example on Raspberry Pii as I do at home.
 
+We tried to get some funding for this project but got none. All the work is done with 0€. <b>Please help and contribute</b>.
+
+If you have new words or if you spot an error(s), please e-mail me.
+
 You'll also need the latest <a href="https://github.com/guovza/satnegirji.db">satnegirji.db</a> SQLite database. Put it somewhere outside your web ducument root. Webserver process need to have access to it anyway. 
 
 Modify the $db variable to suite your configuration:
