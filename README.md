@@ -6,7 +6,7 @@ We tried to get some funding for this project but got none. All the work is done
 
 If you have new words or if you spot an error(s), please e-mail me skuolfi.relay980@passmail.net
 
-You'll also need the latest <a href="https://github.com/guovza/satnegirji.db">satnegirji.db</a> SQLite database. Put it somewhere outside your web ducument root. Webserver process need to have access to it anyway. 
+You'll also need the latest <a href="https://github.com/guovza/satnegirji.db">satnegirji.db</a> SQLite database. Put it somewhere outside your web ducument root. Webserver process needs to have access to it anyway. 
 
 Modify the $db variable to suite your configuration:
 
