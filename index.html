@@ -1,4 +1,12 @@
 <?php
+// Check if the session is already started, if not, start it
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+// Generate CSRF token
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
 // It's always better to configure your webserver to send these http headers
 // In that case, you can remove these header lines below
 header("X-Frame-Options: DENY");
@@ -7,13 +15,18 @@ header("X-Content-Type-Options: nosniff");
 header("Cross-Origin-Resource-Policy: same-origin");
 header("Referrer-Policy: origin-when-cross-origin");
 // On production, turn these off ie. 0
-ini_set('log_errors', '0');
+ini_set('log_errors', '1');
 ini_set('display_errors', 0);
 ini_set('display_startup_errors', 0);
+//ini_set('error_log', '/home/muaybora/logs/satnegirji_php_errors.log');
 error_reporting(E_ALL);
+// Do not cache the page
+header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
+header("Pragma: no-cache");
+header("Expires: 0");
 // Connect to SQLite database
-//$db = new SQLite3('/var/www/db/satnegirji.db');
-$db = new SQLite3('/home/muaybora/db/satnegirji.db');
+$db = new SQLite3('/var/www/db/satnegirji.db');
+//$db = new SQLite3('/home/muaybora/db/satnegirji.db');
 // Initialize the searchType variable
 $searchType = 'full_text';
 // Function to sanitize user input
@@ -147,6 +160,16 @@ $full_text = $searchType === 'full_text';
     </header>
     <main>
         <form method="POST">
+            <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token']) ?>">
+            <?php
+            // Validate CSRF token
+            if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                if (!hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'] ?? '')) {
+                    error_log("Invalid CSRF token");
+                    exit;
+                }
+            }
+            ?>
             <div class="searchbox">
             <input type="text" id="query" name="query" placeholder="hakusana/ohcansátni..." required autofocus>
             <input type="submit" id="submit" value="Hae - Oza">
