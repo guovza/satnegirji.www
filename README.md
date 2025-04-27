@@ -2,7 +2,7 @@ Web-version of Suoma-Sáme-Suoma sátnegirji with PHP and SQLite. This version i
 
 The web app is very lightweight and runs well and fast for example on Raspberry Pii as I do at home.
 
-All the work is done with 0€. <b>Please help and contribute</b>.
+All the work and web-hosting is done without any financial support. <b>Please help and contribute</b>.
 
 If you have new words or if you spot an error(s), please e-mail me skuolfi.relay980@passmail.net
 
