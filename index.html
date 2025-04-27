@@ -1,11 +1,22 @@
 <?php
-// Check if the session is already started, if not, start it
+//Set the cookie lifetime of the session
+ini_set( "session.cookie_lifetime", 0 );
+//Set the maxlifetime of the session
+ini_set( "session.gc_maxlifetime", 1440 );
+ini_set("session.use_strict_mode", 1);
+// Check if the se 1ssion is already started, if not, start it
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
-// Generate CSRF token
-if (empty($_SESSION['csrf_token'])) {
-    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+if (empty($_COOKIE['csrf_token'])) {
+    $csrf_token = bin2hex(random_bytes(32));
+    setcookie('csrf_token', $csrf_token, [
+        'httponly' => true,
+        'secure' => true,
+        'samesite' => 'Strict',
+    ]);
+} else {
+    $csrf_token = $_COOKIE['csrf_token'];
 }
 // It's always better to configure your webserver to send these http headers
 // In that case, you can remove these header lines below
@@ -16,17 +27,18 @@ header("Cross-Origin-Resource-Policy: same-origin");
 header("Referrer-Policy: origin-when-cross-origin");
 // On production, turn these off ie. 0
 ini_set('log_errors', '1');
+ini_set('ignore_repeated_errors', 1);
 ini_set('display_errors', 0);
 ini_set('display_startup_errors', 0);
-//ini_set('error_log', '/home/muaybora/logs/satnegirji_php_errors.log');
+ini_set('error_log', '/home/muaybora/logs/satnegirji_php_errors.log');
 error_reporting(E_ALL);
 // Do not cache the page
 header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
 header("Pragma: no-cache");
 header("Expires: 0");
 // Connect to SQLite database
-$db = new SQLite3('/var/www/db/satnegirji.db');
-//$db = new SQLite3('/home/muaybora/db/satnegirji.db');
+//$db = new SQLite3('/var/www/db/satnegirji.db');
+$db = new SQLite3('/home/muaybora/db/satnegirji.db');
 // Initialize the searchType variable
 $searchType = 'full_text';
 // Function to sanitize user input
@@ -160,13 +172,22 @@ $full_text = $searchType === 'full_text';
     </header>
     <main>
         <form method="POST">
-            <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token']) ?>">
+            <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrf_token); ?>">
             <?php
             // Validate CSRF token
+            /*
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 if (!hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'] ?? '')) {
                     error_log("Invalid CSRF token");
                     exit;
+                }
+            }
+            */
+            // Validate CSRF token using cookies
+            if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                if (!hash_equals($_COOKIE['csrf_token'], $_POST['csrf_token'] ?? '')) {
+                    error_log("Invalid CSRF token");
+                    exit('Invalid CSRF token');
                 }
             }
             ?>
