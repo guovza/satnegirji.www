@@ -4,10 +4,10 @@ ini_set( "session.cookie_lifetime", 0 );
 //Set the maxlifetime of the session
 ini_set( "session.gc_maxlifetime", 1440 );
 ini_set("session.use_strict_mode", 1);
-// Check if the se 1ssion is already started, if not, start it
-if (session_status() === PHP_SESSION_NONE) {
+// Check if the session is already started, if not, start it
+/*if (session_status() === PHP_SESSION_NONE) {
     session_start();
-}
+}*/
 if (empty($_COOKIE['csrf_token'])) {
     $csrf_token = bin2hex(random_bytes(32));
     setcookie('csrf_token', $csrf_token, [
@@ -37,8 +37,8 @@ header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
 header("Pragma: no-cache");
 header("Expires: 0");
 // Connect to SQLite database
-//$db = new SQLite3('/var/www/db/satnegirji.db');
-$db = new SQLite3('/home/muaybora/db/satnegirji.db');
+$db = new SQLite3('/var/www/db/satnegirji.db');
+//$db = new SQLite3('/home/muaybora/db/satnegirji.db');
 // Initialize the searchType variable
 $searchType = 'full_text';
 // Function to sanitize user input
