@@ -1,8 +1,12 @@
 <?php
-//Set the cookie lifetime of the session
+// Set the cookie lifetime of the session
+// Zero as a value means "until the browser is closed" ie. the cookie is a session cookie
+// and stored only in the browser memory
 ini_set( "session.cookie_lifetime", 0 );
-//Set the maxlifetime of the session
-ini_set( "session.gc_maxlifetime", 1440 );
+// Set the maxlifetime of the session
+// Here, we set it to 8 hours (28800 seconds) to prevent csrf token expiration during long
+// browsing sessions
+ini_set( "session.gc_maxlifetime", 28800 );
 ini_set("session.use_strict_mode", 1);
 if (empty($_COOKIE['csrf_token'])) {
     $csrf_token = bin2hex(random_bytes(32));
